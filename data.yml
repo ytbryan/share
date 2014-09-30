@@ -1,0 +1,10 @@
+facebook:
+  secret: xxxxxxxxxxxxxxxx
+  id: xxxxxxxxxxxxxxxx
+  access_token: xxxxxxxxxxxxxxxx
+
+twitter:
+  secret: xxxxxxxxxxxxxxxx
+  key: xxxxxxxxxxxxxxxx
+  access_token: xxxxxxxxxxxxxxxx
+  access_token_secret: xxxxxxxxxxxxxxxx

@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+
+require 'twitter'
+require 'fb_graph'
+require "highline/import"
+require "yaml"
+require "uri"
+
+def setup
+  str = ask "What's on your mind? (ctrl + z to close)"
+  puts "{" + str + "}"
+  url_array = URI.extract(str)
+
+  yml_data = YAML::load(File.open('data.yml'))
+  @facebook_client = FbGraph::Application.new(yml_data["facebook"]["id"], "secret" => yml_data["facebook"]["secret"])
+  @twitter_client = Twitter::REST::Client.new do |config|
+    config.consumer_key        = yml_data["twitter"]["key"]
+    config.consumer_secret     = yml_data["twitter"]["secret"]
+    config.access_token        = yml_data["twitter"]["access_token"]
+    config.access_token_secret = yml_data["twitter"]["access_token_secret"]
+  end
+
+
+  url = ""
+  url = url_array.first unless url_array.count == 0
+
+  begin
+    FbGraph::User.me(yml_data["facebook"]["access_token"]).feed!(
+      :message => str,
+      :link => url
+    )
+  rescue Exception => e
+    puts "Facebook: " + e.message
+  end
+
+  begin
+    @twitter_client.update(str)
+  rescue Exception => e
+    puts "Twitter: " + e.message
+  end
+end
+
+def posts (args)
+
+  yml_data = YAML::load(File.open('data.yml'))
+  @facebook_client = FbGraph::Application.new(yml_data["facebook"]["id"], "secret" => yml_data["facebook"]["secret"])
+  @twitter_client = Twitter::REST::Client.new do |config|
+    config.consumer_key        = yml_data["twitter"]["key"]
+    config.consumer_secret     = yml_data["twitter"]["secret"]
+    config.access_token        = yml_data["twitter"]["access_token"]
+    config.access_token_secret = yml_data["twitter"]["access_token_secret"]
+  end
+  str = args.join(" ")
+  puts "{" + str + "}"
+  url_array = URI.extract(str)
+
+  url = ""
+  url = url_array.first unless url_array.count == 0
+
+  begin
+    FbGraph::User.me(yml_data["facebook"]["access_token"]).feed!(
+      :message => str,
+      :link => url
+    )
+  rescue Exception => e
+    puts "Facebook: " + e.message
+  end
+
+  begin
+    @twitter_client.update(str)
+  rescue Exception => e
+    puts "Twitter: " + e.message
+  end
+end
+
+if ARGV.count == 0
+  setup()
+else
+  posts(ARGV)
+end
